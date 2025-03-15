@@ -7,6 +7,7 @@ import (
 
 	"mrktplc-auth/internal/authorized_domains"
 	"mrktplc-auth/internal/handlers"
+	"mrktplc-auth/internal/middleware"
 	"mrktplc-auth/internal/token"
 
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,9 @@ func main() {
 	if secret == "" {
 		secret = "yes, this is the secret, please do something about it later"
 	}
+
+	// CORS middleware
+	router.Use(middleware.CORS())
 
 	// Set up routes
 	authGroup := router.Group("/auth")
