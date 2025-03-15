@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"mrktplc-auth/internal/authorized_domains"
 	"mrktplc-auth/internal/handlers"
+	"mrktplc-auth/internal/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -20,10 +22,16 @@ func main() {
 	// Create Gin router
 	router := gin.Default()
 
+	// get secret from environment variable or generate a new one
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "yes, this is the secret, please do something about it later"
+	}
+
 	// Set up routes
 	authGroup := router.Group("/auth")
 	{
-		authHandler := handlers.NewAuthHandler(authorized_domains.NewAuthorizedDomains())
+		authHandler := handlers.NewAuthHandler(authorized_domains.NewAuthorizedDomains(), token.NewToken(secret))
 		authGroup.POST("/enter", authHandler.Enter)
 	}
 
