@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24.1-bullseye AS builder
 
 # Set working directory
 WORKDIR /app
@@ -17,16 +17,16 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o mrktplc-auth .
 
 # Final stage
-FROM alpine:latest
+FROM debian:bullseye-slim
+
+# Install ca-certificates for HTTPS
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
 # Copy binary from builder stage
 COPY --from=builder /app/mrktplc-auth .
-
-# Copy .env file if needed (uncomment if you want to include it)
-# COPY .env .
 
 # Expose the port your application runs on
 EXPOSE 8081
